@@ -16,7 +16,7 @@
 
 package com.twitter.scrooge
 
-import com.twitter.scrooge.backend.{Generator, WithFinagle}
+import com.twitter.scrooge.backend.{Generator, WithFinagle, WithJson}
 import java.io.File
 import java.util.Properties
 import scopt.OptionParser
@@ -108,6 +108,9 @@ object Main {
 
       opt("finagle", "generate finagle classes",
         { compiler.flags += WithFinagle; () })
+
+      opt("json", "generate json codecs on generated structs",
+      { compiler.flags += WithJson; () })
 
       arglist("<files...>", "thrift files to compile", { compiler.thriftFiles += _ })
     }
