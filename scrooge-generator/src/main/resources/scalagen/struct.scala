@@ -13,6 +13,9 @@ import scala.collection.mutable.{
   ArrayBuffer => mutable$ArrayBuffer, Buffer => mutable$Buffer,
   HashMap => mutable$HashMap, HashSet => mutable$HashSet}
 import scala.collection.{Map, Set}
+{{#withJson}}
+import com.persist.JsonOps._
+{{/withJson}}
 
 {{/public}}
 {{docstring}}

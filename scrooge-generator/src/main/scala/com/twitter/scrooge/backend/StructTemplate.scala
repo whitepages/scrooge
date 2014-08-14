@@ -253,6 +253,8 @@ trait StructTemplate {
       "scala.Product"
     }
 
+    val withJson = serviceOptions.contains(WithJson)
+
     val exceptionMsgField: Option[SimpleID] = if (isException) exceptionMsgFieldName(struct) else None
 
     val fieldDictionaries = fieldsToDict(
@@ -288,7 +290,8 @@ trait StructTemplate {
       "arityN" -> v(arity > 1 && arity <= 22),
       "withFieldGettersAndSetters" -> v(isStruct || isException),
       "withTrait" -> v(isStruct),
-      "structAnnotations" -> v(StructTemplate.renderPairs(struct.annotations))
+      "structAnnotations" -> v(StructTemplate.renderPairs(struct.annotations)),
+      "withJson" -> v(withJson)
     )
   }
 }
