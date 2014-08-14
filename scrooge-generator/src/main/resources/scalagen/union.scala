@@ -11,6 +11,11 @@ import scala.collection.mutable.{
   HashMap => mutable$HashMap, HashSet => mutable$HashSet}
 import scala.collection.{Map, Set}
 
+{{#withJson}}
+import com.persist.JsonOps._
+import com.persist.json.ReadWriteCodec
+{{/withJson}}
+
 {{/public}}
 @javax.annotation.Generated(value = Array("com.twitter.scrooge.Compiler"))
 sealed trait {{StructName}} extends {{parentType}}
@@ -108,6 +113,22 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   def apply(_iprot: TProtocol): {{StructName}} = decode(_iprot)
 
   import {{StructName}}Aliases._
+
+{{#withJson}}
+  implicit object {{StructName}}ReadWriteCodec extends ReadWriteCodec[{{StructName}}] {
+    def read(json: Json): {{StructName}} = {
+      val jsObject = json.asInstanceOf[JsonObject]
+      jsObject.keys.head match {{{#fields}}
+        case "{{fieldName}}" => {{FieldName}}({{fieldName}} = com.persist.json.read[{{>qualifiedFieldType}}](jsObject.values.head))
+        {{/fields}}
+      }
+    }
+    def write(obj: {{StructName}}): Json = obj match {{{#fields}}
+      case {{FieldName}}(x) => JsonObject("{{fieldName}}" -> com.persist.json.toJson(x))
+    {{/fields}}
+    }
+  }
+{{/withJson}}
 
 {{#fields}}
   object {{FieldName}} {

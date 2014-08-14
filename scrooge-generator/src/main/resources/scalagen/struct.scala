@@ -13,11 +13,13 @@ import scala.collection.mutable.{
   ArrayBuffer => mutable$ArrayBuffer, Buffer => mutable$Buffer,
   HashMap => mutable$HashMap, HashSet => mutable$HashSet}
 import scala.collection.{Map, Set}
+{{/public}}
+
 {{#withJson}}
 import com.persist.JsonOps._
+import com.persist.json._
 {{/withJson}}
 
-{{/public}}
 {{docstring}}
 object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   private val NoPassthroughFields = immutable$Map.empty[Short, TFieldBlob]
@@ -177,6 +179,21 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   def unapply(_item: {{StructName}}): Option[{{product}}] = Some(_item)
 {{/arityN}}
 
+{{#withJson}}
+  implicit object {{StructName}}ReadWriteCodec extends ReadWriteCodec[{{StructName}}] {
+    def read(json: Json) = {
+      val map = json.asInstanceOf[JsonObject]
+      {{StructName}}({{#fields}}{{#readWriteInfo}}
+      {{fieldName}} = com.persist.json.read[{{>optionalType}}](map("{{snake_case_name}}"))
+      {{/readWriteInfo}}{{/fields|,}}
+      )
+    }
+    def write(obj: {{StructName}}) = JsonObject({{#fields}}{{#readWriteInfo}}
+    "{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})
+    {{/readWriteInfo}}{{/fields|,}}
+    )
+  }
+{{/withJson}}
 
 {{#fields}}
   private def {{readFieldValueName}}(_iprot: TProtocol): {{fieldType}} = {

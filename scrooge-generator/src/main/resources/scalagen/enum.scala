@@ -2,6 +2,11 @@ package {{package}}
 
 import com.twitter.scrooge.ThriftEnum
 
+{{#withJson}}
+import com.persist.JsonOps._
+import com.persist.json.ReadWriteCodec
+{{/withJson}}
+
 {{docstring}}
 @javax.annotation.Generated(value = Array("com.twitter.scrooge.Compiler"))
 case object {{EnumName}} {
@@ -54,6 +59,13 @@ case object {{EnumName}} {
     {{package}}.{{EnumName}}.{{name}}
 {{/values|,}}
   )
+
+{{#withJson}}
+  implicit object ReadWrite{{EnumName}} extends ReadWriteCodec[{{EnumName}}] {
+  def read(json: Json) = valueOf(json.asInstanceOf[String]).get
+  def write(obj: Day) = obj.toString
+  }
+{{/withJson}}
 }
 
 
