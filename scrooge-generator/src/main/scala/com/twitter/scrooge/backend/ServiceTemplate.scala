@@ -203,7 +203,8 @@ trait ServiceTemplate {
       "finagleServices" -> v(
         if (withFinagle) Seq(finagleService(service, namespace)) else Seq()
       ),
-      "withFinagle" -> v(withFinagle)
+      "withFinagle" -> v(withFinagle),
+      "withJson" -> v(false)
     )
   }
 }
