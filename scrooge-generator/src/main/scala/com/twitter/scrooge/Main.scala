@@ -16,7 +16,7 @@
 
 package com.twitter.scrooge
 
-import com.twitter.scrooge.backend.{WithScalaWebServices, Generator, WithFinagle, WithJson}
+import com.twitter.scrooge.backend.{WithScalaWebService, Generator, WithFinagle, WithJson}
 import java.io.File
 import java.util.Properties
 import scopt.OptionParser
@@ -112,8 +112,8 @@ object Main {
       opt("json", "generate json codecs on generated structs",
       { compiler.flags += WithJson; () })
 
-      opt("scalaWebServices", "generate Scala web services clients",
-      { compiler.flags += WithScalaWebServices; () })
+      opt("scalaWebService", "generate Scala web service clients",
+      { compiler.flags += WithScalaWebService; () })
 
       arglist("<files...>", "thrift files to compile", { compiler.thriftFiles += _ })
     }

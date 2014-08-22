@@ -165,7 +165,7 @@ trait ServiceTemplate {
     options: Set[ServiceOption]
   ) = {
     val withFinagle = options.contains(WithFinagle)
-    val withScalaWebServices = options.contains(WithScalaWebServices)
+    val withScalaWebService = options.contains(WithScalaWebService)
     val withJson = options.contains(WithJson)
     Dictionary(
       "function" -> v(templates("function")),
@@ -208,7 +208,7 @@ trait ServiceTemplate {
         if (withFinagle) Seq(finagleService(service, namespace)) else Seq()
       ),
       "withFinagle" -> v(withFinagle),
-      "withScalaWebServices" -> v(withScalaWebServices),
+      "withScalaWebService" -> v(withScalaWebService),
       "withJson" -> v(withJson)
     )
   }

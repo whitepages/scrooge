@@ -30,7 +30,7 @@ abstract sealed class ServiceOption
 
 case object WithFinagle extends ServiceOption
 case object WithJson extends ServiceOption
-case object WithScalaWebServices extends ServiceOption
+case object WithScalaWebService extends ServiceOption
 case class JavaService(service: Service, options: Set[ServiceOption])
 
 trait ThriftGenerator {

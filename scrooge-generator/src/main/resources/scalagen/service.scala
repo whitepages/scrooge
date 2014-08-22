@@ -36,6 +36,10 @@ object {{ServiceName}} {
 
 {{#withScalaWebService}}
   import akka.actor.ActorRefFactory
+  import com.whitepages.framework.util.ClassSupport
+  import com.whitepages.framework.client.Client
+  import scala.concurrent.Future
+  import com.whitepages.framework.logging.noId
 
   class Client(actorRefFactory: ActorRefFactory, endPoint: String) extends ClassSupport {
     val clientName = "{{ServiceName}}"
@@ -46,9 +50,9 @@ object {{ServiceName}} {
     {{#asyncFunctions}}
     {{>function}} = {
       val args = {{ServiceName}}.{{funcName}}$args({{#fieldParams}}{{name}}{{/fieldParams|,}})
-      val startTime  System.nanoTime()
-      thriftClient.postThrift({{snake_func_name}}, args, noId, uriString = endPoint)
-        .mapTp[Mcs.{{funcName}}$result]
+      val startTime = System.nanoTime()
+      thriftClient.postThrift("{{snake_func_name}}", args, noId, uriString = endPoint)
+        .mapTo[{{ServiceName}}.{{funcName}}$result]
         .map( _.success.get)
         .andThen { _ => monitor ! {{ServiceName}}{{funcName}}Latency(System.nanoTime() - startTime)}
     }
@@ -57,15 +61,10 @@ object {{ServiceName}} {
 
   import com.codahale.metrics.MetricRegistry
 
-  object {{ServiceName}}Monitor {
-    sealed trait {{ServiceName}}Messages
-    {{#functions}}
+    sealed abstract class {{ServiceName}}Messages { val duration: Long }
+    {{#asyncFunctions}}
     case class {{funcName}}Latency(duration: Long) extends {{ServiceName}}Messages
-
-    def ext(metrics: MetricRegistry): PartialFunction[Any, Unit] = {
-      val
-    }
-  }
+    {{/asyncFunctions}}
 {{/withScalaWebService}}
 
 {{#withFinagle}}
