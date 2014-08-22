@@ -34,6 +34,40 @@ object {{ServiceName}} {
 {{/internalResultStruct}}
 {{/internalStructs}}
 
+{{#withScalaWebService}}
+  import akka.actor.ActorRefFactory
+
+  class Client(actorRefFactory: ActorRefFactory, endPoint: String) extends ClassSupport {
+    val clientName = "{{ServiceName}}"
+
+    private[this] implicit val ec = actorRefFactory.dispatcher
+    val thriftClient = Client(actorRefFactory, clientName)
+
+    {{#asyncFunctions}}
+    {{>function}} = {
+      val args = {{ServiceName}}.{{funcName}}$args({{#fieldParams}}{{name}}{{/fieldParams|,}})
+      val startTime  System.nanoTime()
+      thriftClient.postThrift({{snake_func_name}}, args, noId, uriString = endPoint)
+        .mapTp[Mcs.{{funcName}}$result]
+        .map( _.success.get)
+        .andThen { _ => monitor ! {{ServiceName}}{{funcName}}Latency(System.nanoTime() - startTime)}
+    }
+    {{/asynFunctions}}
+  }
+
+  import com.codahale.metrics.MetricRegistry
+
+  object {{ServiceName}}Monitor {
+    sealed trait {{ServiceName}}Messages
+    {{#functions}}
+    case class {{funcName}}Latency(duration: Long) extends {{ServiceName}}Messages
+
+    def ext(metrics: MetricRegistry): PartialFunction[Any, Unit] = {
+      val
+    }
+  }
+{{/withScalaWebService}}
+
 {{#withFinagle}}
   import com.twitter.util.Future
 

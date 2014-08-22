@@ -19,6 +19,7 @@ package com.twitter.scrooge.backend
 import com.twitter.scrooge.ast._
 import com.twitter.scrooge.mustache.Dictionary
 import com.twitter.scrooge.mustache.Dictionary._
+import com.twitter.scrooge.util._
 
 trait ServiceTemplate {
   self: Generator =>
@@ -39,6 +40,7 @@ trait ServiceTemplate {
       "hasThrows" -> v(hasThrows),
       "throws" -> v(throwsDictionaries),
       "funcName" -> genID(function.funcName.toCamelCase),
+      "snake_func_name" -> genID(SimpleID(camelToSnake(function.funcName.name))),
       "typeName" -> genType(function.funcType),
       "fieldParams" -> genFieldParams(function.args)
     )
@@ -163,6 +165,7 @@ trait ServiceTemplate {
     options: Set[ServiceOption]
   ) = {
     val withFinagle = options.contains(WithFinagle)
+    val withScalaWebServices = options.contains(WithScalaWebServices)
     val withJson = options.contains(WithJson)
     Dictionary(
       "function" -> v(templates("function")),
@@ -205,6 +208,7 @@ trait ServiceTemplate {
         if (withFinagle) Seq(finagleService(service, namespace)) else Seq()
       ),
       "withFinagle" -> v(withFinagle),
+      "withScalaWebServices" -> v(withScalaWebServices),
       "withJson" -> v(withJson)
     )
   }
