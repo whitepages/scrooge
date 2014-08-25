@@ -182,7 +182,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{/arityN}}
 
 {{#withJson}}
-  implicit object {{StructName}}ReadWriteCodec extends ReadWriteCodec[{{StructName}}] {
+  implicit val jsonCodec = new ReadWriteCodec[{{StructName}}] {
     def read(json: Json) = {
       val map = ReadCodec.castOrThrow(json)
       {{#fields}}{{#readWriteInfo}}
