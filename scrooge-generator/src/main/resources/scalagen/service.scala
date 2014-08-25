@@ -34,6 +34,22 @@ object {{ServiceName}} {
 {{/internalResultStruct}}
 {{/internalStructs}}
 
+{{#withJson}}
+
+val map: Map[String, Info] = Map({{#internalStructs}}
+  "{{funcName}}" -> Info(
+                      TInfo({{#internalArgsStruct}}
+                        is = _.isInstanceOf[{{StructName}}],
+                        codec = {{StructName}}.jsonCodec,
+                        companion = {{StructName}}{{/internalArgsStruct}}),
+                      TInfo({{#internalResultStruct}}
+                        is = _.isInstanceOf[{{StructName}}],
+                        codec = {{StructName}}.jsonCodec,
+                        companion = {{StructName}}{{/internalResultStruct}}))
+{{/internalStructs|,}}
+)
+{{/withJson}}
+
 {{#withFinagle}}
   import com.twitter.util.Future
 

@@ -402,6 +402,18 @@ trait Generator
         generatedFiles ++= finagleClientFileOpt
     }
 
+    if (serviceOptions.contains(WithJson)) {
+      val jsonFile = new File(packageDir, "Json.scala")
+      // HACK
+      val dict = serviceDict(doc.services.head, namespace, includes, serviceOptions)
+      // END HACK
+      // It really sort of sucks that dryRun is sprinkled everywhere but I am not going to change this here and now
+      if (!dryRun) {
+        writeFile(jsonFile, templates.header, templates("json").generate(dict))
+      }
+      generatedFiles += jsonFile
+    }
+
     generatedFiles
   }
 }
