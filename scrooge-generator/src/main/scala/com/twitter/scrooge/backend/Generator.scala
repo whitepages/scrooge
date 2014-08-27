@@ -354,7 +354,7 @@ trait Generator
       enum =>
         val file = new File(packageDir, enum.sid.toTitleCase.name + fileExtension)
         if (!dryRun) {
-          val dict = enumDict(namespace, enum)
+          val dict = enumDict(namespace, enum, serviceOptions)
           writeFile(file, templates.header, templates("enum").generate(dict))
         }
         generatedFiles += file
