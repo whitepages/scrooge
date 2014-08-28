@@ -182,7 +182,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{/arityN}}
 
 {{#withJson}}
-  implicit val jsonCodec = new ReadWriteCodec[{{StructName}}] {
+  implicit val jsonReadCodec = new ReadCodec[{{StructName}}] {
     def read(json: Json) = {
       val map = ReadCodec.castOrThrow(json)
       {{#fields}}{{#readWriteInfo}}
@@ -195,9 +195,11 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
       {{/readWriteInfo}}{{/fields|,}}
       )
     }
+   }
+  implicit val jsonWriteCodec = new WriteCodec[{{StructName}}] {
     def write(obj: {{StructName}}) = JsonObject({{#fields}}{{#readWriteInfo}}
-    "{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})
-    {{/readWriteInfo}}{{/fields|,}}
+      "{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})
+      {{/readWriteInfo}}{{/fields|,}}
     )
   }
 {{/withJson}}

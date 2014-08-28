@@ -40,11 +40,13 @@ val map: Map[String, Info] = Map({{#internalStructs}}
   "{{funcName}}" -> Info(
                       TInfo({{#internalArgsStruct}}
                         is = _.isInstanceOf[{{StructName}}],
-                        codec = {{StructName}}.jsonCodec,
+                        readCodec = {{StructName}}.jsonReadCodec,
+                        writeCodec = {{StructName}}.jsonWriteCodec,
                         companion = {{StructName}}{{/internalArgsStruct}}),
                       TInfo({{#internalResultStruct}}
                         is = _.isInstanceOf[{{StructName}}],
-                        codec = {{StructName}}.jsonCodec,
+                        readCodec = {{StructName}}.jsonReadCodec,
+                        writeCodec = {{StructName}}.jsonWriteCodec,
                         companion = {{StructName}}{{/internalResultStruct}}))
 {{/internalStructs|,}}
 )

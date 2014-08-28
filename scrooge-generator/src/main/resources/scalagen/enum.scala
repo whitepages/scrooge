@@ -4,7 +4,7 @@ import com.twitter.scrooge.ThriftEnum
 
 {{#withJson}}
 import com.persist.JsonOps._
-import com.persist.json.ReadWriteCodec
+import com.persist.json._
 {{/withJson}}
 
 {{docstring}}
@@ -61,9 +61,11 @@ case object {{EnumName}} {
   )
 
 {{#withJson}}
-  implicit object ReadWrite{{EnumName}} extends ReadWriteCodec[{{EnumName}}] {
-  def read(json: Json) = valueOf(json.asInstanceOf[String]).get
-  def write(obj: Day) = obj.toString
+  implicit object JsonReadCodec extends ReadCodec[{{EnumName}}] {
+    def read (json: Json) = valueOf (json.asInstanceOf[String] ).get
+  }
+  implicit object JsonWriteCodec extends WriteCodec[{{EnumName}}] {
+    def write(obj: {{EnumName}}) = obj.toString
   }
 {{/withJson}}
 }
