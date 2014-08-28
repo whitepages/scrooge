@@ -5,7 +5,7 @@ import com.typesafe.sbt.site.SphinxSupport.Sphinx
 import net.virtualvoid.sbt.cross.CrossPlugin
 
 object Scrooge extends Build {
-  val libVersion = "3.16.4-SNAPSHOT"
+  val libVersion = "3.16.7"
   val utilVersion = "6.19.0"
   val finagleVersion = "6.20.0"
 
@@ -69,6 +69,17 @@ object Scrooge extends Build {
     organization := "com.twitter",
     crossScalaVersions := Seq("2.9.2", "2.10.4"),
     scalaVersion := "2.10.4",
+    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/")),
+
+    credentials += Credentials("Artifactory Realm",
+      "jrepo0.dev.pages",
+      "search",
+      "bestsource"),
+
+    credentials += Credentials("Artifactory Realm", // Maven credentials. NOTE: Do not change this line.
+      "jrepo0.util.pages",
+      "jenkins-search",
+      "bestsource"),
 
     resolvers ++= Seq(
       "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
@@ -114,12 +125,14 @@ object Scrooge extends Build {
           <url>https://www.twitter.com/</url>
         </developer>
       </developers>),
-    publishTo <<= version { (v: String) =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    publishTo <<= version {
+      (v: String) =>
+        val jrepo_dev = "http://jrepo0.dev.pages:8081/artifactory/"
+        val jrepo_prod = "http://jrepo0.util.pages:8081/artifactory/"
+        if (v.trim.endsWith("SNAPSHOT"))
+          Some("snapshots" at jrepo_dev + "wp-search-snapshots")
+        else
+          Some("releases" at jrepo_prod + "wp-search-release")
     },
 
     resourceGenerators in Compile <+=
