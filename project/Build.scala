@@ -67,7 +67,6 @@ object Scrooge extends Build {
   val sharedSettings = Seq(
     version := libVersion,
     organization := "com.twitter",
-    crossScalaVersions := Seq("2.9.2", "2.10.4"),
     scalaVersion := "2.10.4",
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/")),
 
