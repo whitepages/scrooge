@@ -6,7 +6,7 @@ import net.virtualvoid.sbt.cross.CrossPlugin
 
 object Scrooge extends Build {
   val libVersion = "3.16.7"
-  val utilVersion = "6.19.0"
+  val utilVersion = "6.20.0"
   val finagleVersion = "6.20.0"
 
   def util(which: String) = "com.twitter" %% ("util-"+which) % utilVersion
@@ -92,7 +92,7 @@ object Scrooge extends Build {
     otherResolvers += m2Repo,
 
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "1.9.1" % "test",
+      "org.scalatest" %% "scalatest" % (if ((scalaVersion in Compile).value.startsWith("2.11")) "2.1.3" else "1.9.1") % "test",
       "junit" % "junit" % "4.8.1" % "test"
     ),
     resolvers += "twitter-repo" at "http://maven.twttr.com",
@@ -207,7 +207,8 @@ object Scrooge extends Build {
     name := "scrooge-core",
     libraryDependencies ++= Seq(
       "org.apache.thrift" % "libthrift" % "0.8.0" % "provided"
-    )
+    ),
+    crossScalaVersions += "2.11.2"
   )
 
   lazy val scroogeRuntime = Project(
