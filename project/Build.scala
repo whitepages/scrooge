@@ -5,7 +5,7 @@ import com.typesafe.sbt.site.SphinxSupport.Sphinx
 import net.virtualvoid.sbt.cross.CrossPlugin
 
 object Scrooge extends Build {
-  val libVersion = "3.16.7"
+  val libVersion = "3.16.9"
   val utilVersion = "6.20.0"
   val finagleVersion = "6.20.0"
 
@@ -205,7 +205,8 @@ object Scrooge extends Build {
   ).settings(
     name := "scrooge-core",
     libraryDependencies ++= Seq(
-      "org.apache.thrift" % "libthrift" % "0.8.0" % "provided"
+      "org.apache.thrift" % "libthrift" % "0.8.0" % "provided",
+      "com.persist" % "persist-json_2.11" % "0.19-SNAPSHOT"
     ),
     crossScalaVersions += "2.11.2"
   )

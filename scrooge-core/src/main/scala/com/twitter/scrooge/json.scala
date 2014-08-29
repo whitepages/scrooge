@@ -1,7 +1,6 @@
-package {{package}}
+package com.twitter.scrooge
 
-import com.twitter.scrooge.{ThriftStruct, ThriftStructCodec}
-import com.persist.json._
+import com.persist.json.{WriteCodec, ReadCodec}
 
 case class Info(in: TInfo, out: TInfo)
 
