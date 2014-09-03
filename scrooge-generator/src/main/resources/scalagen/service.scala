@@ -36,6 +36,8 @@ object {{ServiceName}} {
 
 {{#withJson}}
 
+import com.twitter.scrooge.{Info, TInfo}
+
 val map: Map[String, Info] = Map({{#internalStructs}}
   "{{funcName}}" -> Info(
                       TInfo({{#internalArgsStruct}}
