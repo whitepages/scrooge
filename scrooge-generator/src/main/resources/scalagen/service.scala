@@ -34,37 +34,57 @@ object {{ServiceName}} {
 {{/internalResultStruct}}
 {{/internalStructs}}
 
+{{#withJson}}
+
+import com.twitter.scrooge.{Info, TInfo}
+
+val map: Map[String, Info] = Map({{#internalStructs}}
+  "{{funcName}}" -> Info(
+                      TInfo({{#internalArgsStruct}}
+                        is = _.isInstanceOf[{{StructName}}],
+                        readCodec = {{StructName}}.jsonReadCodec,
+                        writeCodec = {{StructName}}.jsonWriteCodec,
+                        companion = {{StructName}}{{/internalArgsStruct}}),
+                      TInfo({{#internalResultStruct}}
+                        is = _.isInstanceOf[{{StructName}}],
+                        readCodec = {{StructName}}.jsonReadCodec,
+                        writeCodec = {{StructName}}.jsonWriteCodec,
+                        companion = {{StructName}}{{/internalResultStruct}}))
+{{/internalStructs|,}}
+)
+{{/withJson}}
+
 {{#withScalaWebService}}
-  import akka.actor.ActorRefFactory
-  import com.whitepages.framework.util.ClassSupport
-  import com.whitepages.framework.client.Client
-  import scala.concurrent.Future
-  import com.whitepages.framework.logging.noId
+import akka.actor.ActorRefFactory
+import com.whitepages.framework.util.ClassSupport
+import com.whitepages.framework.client.Client
+import scala.concurrent.Future
+import com.whitepages.framework.logging.noId
 
-  class Client(actorRefFactory: ActorRefFactory, endPoint: String) extends ClassSupport {
-    val clientName = "{{ServiceName}}"
+class Client(actorRefFactory: ActorRefFactory, endPoint: String) extends ClassSupport {
+  val clientName = "{{ServiceName}}"
 
-    private[this] implicit val ec = actorRefFactory.dispatcher
-    val thriftClient = Client(actorRefFactory, clientName)
+  private[this] implicit val ec = actorRefFactory.dispatcher
+  val thriftClient = Client(actorRefFactory, clientName)
 
-    {{#asyncFunctions}}
-    {{>function}} = {
-      val args = {{ServiceName}}.{{funcName}}$args({{#fieldParams}}{{name}}{{/fieldParams|,}})
-      val startTime = System.nanoTime()
-      thriftClient.postThrift("{{snake_func_name}}", args, noId, uriString = endPoint)
-        .mapTo[{{ServiceName}}.{{funcName}}$result]
-        .map( _.success.get)
-        .andThen { _ => monitor ! {{ServiceName}}{{funcName}}Latency(System.nanoTime() - startTime)}
-    }
-    {{/asynFunctions}}
+  {{#asyncFunctions}}
+  {{>function}} = {
+    val args = {{ServiceName}}.{{funcName}}$args({{#fieldParams}}{{name}}{{/fieldParams|,}})
+    val startTime = System.nanoTime()
+    thriftClient.postThrift("{{snake_func_name}}", args, noId, uriString = endPoint)
+      .mapTo[{{ServiceName}}.{{funcName}}$result]
+    .map( _.success.get)
+      .andThen { _ => monitor ! {{ServiceName}}{{funcName}}Latency(System.nanoTime() - startTime)}
   }
+  {{/asynFunctions}}
+}
 
-  import com.codahale.metrics.MetricRegistry
+import com.codahale.metrics.MetricRegistry
 
-    sealed abstract class {{ServiceName}}Messages { val duration: Long }
-    {{#asyncFunctions}}
-    case class {{funcName}}Latency(duration: Long) extends {{ServiceName}}Messages
-    {{/asyncFunctions}}
+sealed abstract class {{ServiceName}}Messages { val duration: Long }
+{{#asyncFunctions}}
+case class {{funcName}}Latency(duration: Long) extends {{ServiceName}}Messages
+{{/asyncFunctions}}
 {{/withScalaWebService}}
 
 {{#withFinagle}}

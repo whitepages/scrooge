@@ -18,6 +18,8 @@ import scala.collection.{Map, Set}
 {{#withJson}}
 import com.persist.JsonOps._
 import com.persist.json._
+import com.persist.Exceptions.MappingException
+import scala.util.Try
 {{/withJson}}
 
 {{docstring}}
@@ -180,17 +182,24 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{/arityN}}
 
 {{#withJson}}
-  implicit object {{StructName}}ReadWriteCodec extends ReadWriteCodec[{{StructName}}] {
+  implicit val jsonReadCodec = new ReadCodec[{{StructName}}] {
     def read(json: Json) = {
-      val map = json.asInstanceOf[JsonObject]
+      val map = ReadCodec.castOrThrow(json)
+      {{#fields}}{{#readWriteInfo}}
+      val fieldValue{{fieldName}} = map.getOrElse("{{fieldName}}", throw new MappingException(s"Expected field {{fieldName}} on JsonObject $map"))
+      {{/readWriteInfo}}{{/fields}}
       {{StructName}}({{#fields}}{{#readWriteInfo}}
-      {{fieldName}} = com.persist.json.read[{{>optionalType}}](map("{{snake_case_name}}"))
+      {{fieldName}} = Try(com.persist.json.read[{{>optionalType}}](fieldValue{{fieldName}})).recover {
+        case MappingException(msg, path) => throw MappingException(msg, s"{{fieldName}}/$path")
+      }.get
       {{/readWriteInfo}}{{/fields|,}}
       )
     }
+   }
+  implicit val jsonWriteCodec = new WriteCodec[{{StructName}}] {
     def write(obj: {{StructName}}) = JsonObject({{#fields}}{{#readWriteInfo}}
-    "{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})
-    {{/readWriteInfo}}{{/fields|,}}
+      "{{fieldName}}" -> com.persist.json.toJson(obj.{{fieldName}})
+      {{/readWriteInfo}}{{/fields|,}}
     )
   }
 {{/withJson}}

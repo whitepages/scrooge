@@ -8,7 +8,8 @@ trait EnumTemplate {
   self: Generator =>
   def enumDict(
                 namespace: Identifier,
-                enum: Enum
+                enum: Enum,
+                serviceOptions: Set[ServiceOption]
                 ): Dictionary =
     Dictionary(
       "package" -> genID(namespace),
@@ -23,6 +24,7 @@ trait EnumTemplate {
             "unquotedNameLowerCase" -> codify(value.sid.fullName.toLowerCase),
             "value" -> codify(value.value.toString)
           )
-      })
+      }),
+      "withJson" -> v(serviceOptions.contains(WithJson))
     )
 }

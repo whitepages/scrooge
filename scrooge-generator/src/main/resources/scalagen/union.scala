@@ -13,7 +13,7 @@ import scala.collection.{Map, Set}
 
 {{#withJson}}
 import com.persist.JsonOps._
-import com.persist.json.ReadWriteCodec
+import com.persist.json._
 {{/withJson}}
 
 {{/public}}
@@ -115,7 +115,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   import {{StructName}}Aliases._
 
 {{#withJson}}
-  implicit object {{StructName}}ReadWriteCodec extends ReadWriteCodec[{{StructName}}] {
+  implicit object JsonReadCodec extends ReadCodec[{{StructName}}] {
     def read(json: Json): {{StructName}} = {
       val jsObject = json.asInstanceOf[JsonObject]
       jsObject.keys.head match {{{#fields}}
@@ -123,6 +123,8 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
         {{/fields}}
       }
     }
+  }
+  implicit object JsonWriteCodec extends WriteCodec[{{StructName}}] {
     def write(obj: {{StructName}}): Json = obj match {{{#fields}}
       case {{FieldName}}(x) => JsonObject("{{fieldName}}" -> com.persist.json.toJson(x))
     {{/fields}}
