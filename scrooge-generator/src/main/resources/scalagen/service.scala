@@ -38,7 +38,7 @@ object {{ServiceName}} {
 
 import com.twitter.scrooge.{Info, TInfo}
 
-val map: Map[String, Info[ThriftStruct]] = Map({{#internalStructs}}
+val map: Map[String, Info[ThriftStruct, ThriftStruct]] = Map({{#internalStructs}}
   "{{funcName}}" -> Info(
                       TInfo({{#internalArgsStruct}}
                         is = _.isInstanceOf[{{StructName}}],
