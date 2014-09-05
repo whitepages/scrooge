@@ -38,18 +38,18 @@ object {{ServiceName}} {
 
 import com.twitter.scrooge.{Info, TInfo}
 
-val map: Map[String, Info[ThriftStruct, ThriftStruct]] = Map({{#internalStructs}}
+val map: Map[String, Info] = Map({{#internalStructs}}
   "{{funcName}}" -> Info(
-                      TInfo({{#internalArgsStruct}}
-                        is = _.isInstanceOf[{{StructName}}],
+                      {{#internalArgsStruct}}TInfo[{{StructName}}](
+                        is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
                         readCodec = {{StructName}}.jsonReadCodec,
                         writeCodec = {{StructName}}.jsonWriteCodec,
-                        companion = {{StructName}}{{/internalArgsStruct}}),
-                      TInfo({{#internalResultStruct}}
-                        is = _.isInstanceOf[{{StructName}}],
+                        companion = {{StructName}}{{/internalArgsStruct}}).asInstanceOf[TInfo[ThriftStruct]],
+                      {{#internalResultStruct}}TInfo[{{StructName}}](
+                        is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
                         readCodec = {{StructName}}.jsonReadCodec,
                         writeCodec = {{StructName}}.jsonWriteCodec,
-                        companion = {{StructName}}{{/internalResultStruct}}))
+                        companion = {{StructName}}{{/internalResultStruct}}).asInstanceOf[ThriftStruct])
 {{/internalStructs|,}}
 )
 {{/withJson}}
