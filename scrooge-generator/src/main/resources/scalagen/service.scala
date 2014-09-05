@@ -38,7 +38,7 @@ object {{ServiceName}} {
 
 import com.twitter.scrooge.{Info, TInfo}
 
-val map: Map[String, Info] = Map({{#internalStructs}}
+def map: Map[String, Info] = Map({{#internalStructs}}
   "{{funcName}}" -> Info(
                       {{#internalArgsStruct}}TInfo[{{StructName}}](
                         is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
@@ -49,7 +49,7 @@ val map: Map[String, Info] = Map({{#internalStructs}}
                         is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
                         readCodec = {{StructName}}.jsonReadCodec,
                         writeCodec = {{StructName}}.jsonWriteCodec,
-                        companion = {{StructName}}{{/internalResultStruct}}).asInstanceOf[ThriftStruct])
+                        companion = {{StructName}}{{/internalResultStruct}}).asInstanceOf[TInfo[ThriftStruct]])
 {{/internalStructs|,}}
 )
 {{/withJson}}
