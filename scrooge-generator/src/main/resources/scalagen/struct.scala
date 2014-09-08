@@ -186,11 +186,11 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
     def read(json: Json) = {
       val map = ReadCodec.castOrThrow(json)
       {{#fields}}{{#readWriteInfo}}
-      val fieldValue{{fieldName}} = map.getOrElse("{{fieldName}}", throw new MappingException(s"Expected field {{fieldName}} on JsonObject $map"))
+      val fieldValue{{fieldName}} = map.getOrElse("{{snake_case_name}}", throw new MappingException(s"Expected field {{snake_case_name}} on JsonObject $map"))
       {{/readWriteInfo}}{{/fields}}
       {{StructName}}({{#fields}}{{#readWriteInfo}}
       {{fieldName}} = Try(com.persist.json.read[{{>optionalType}}](fieldValue{{fieldName}})).recover {
-        case MappingException(msg, path) => throw MappingException(msg, s"{{fieldName}}/$path")
+        case MappingException(msg, path) => throw MappingException(msg, s"{{snake_case_name}}/$path")
       }.get
       {{/readWriteInfo}}{{/fields|,}}
       )
@@ -198,7 +198,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
    }
   implicit val jsonWriteCodec = new WriteCodec[{{StructName}}] {
     def write(obj: {{StructName}}) = JsonObject({{#fields}}{{#readWriteInfo}}
-      "{{fieldName}}" -> com.persist.json.toJson(obj.{{fieldName}})
+      "{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})
       {{/readWriteInfo}}{{/fields|,}}
     )
   }

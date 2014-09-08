@@ -119,14 +119,14 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
     def read(json: Json): {{StructName}} = {
       val jsObject = json.asInstanceOf[JsonObject]
       jsObject.keys.head match {{{#fields}}
-        case "{{fieldName}}" => {{FieldName}}({{fieldName}} = com.persist.json.read[{{>qualifiedFieldType}}](jsObject.values.head))
+        case "{{snake_case_name}}" => {{FieldName}}({{fieldName}} = com.persist.json.read[{{>qualifiedFieldType}}](jsObject.values.head))
         {{/fields}}
       }
     }
   }
   implicit object JsonWriteCodec extends WriteCodec[{{StructName}}] {
     def write(obj: {{StructName}}): Json = obj match {{{#fields}}
-      case {{FieldName}}(x) => JsonObject("{{fieldName}}" -> com.persist.json.toJson(x))
+      case {{FieldName}}(x) => JsonObject("{{snake_case_name}}" -> com.persist.json.toJson(x))
     {{/fields}}
     }
   }

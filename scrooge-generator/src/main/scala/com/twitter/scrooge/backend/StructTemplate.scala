@@ -21,6 +21,8 @@ import com.twitter.scrooge.mustache.Dictionary
 import com.twitter.scrooge.mustache.Dictionary._
 import com.twitter.scrooge.frontend.ScroogeInternalException
 
+import com.twitter.scrooge.util._
+
 trait StructTemplate {
   self: Generator =>
 
@@ -125,6 +127,7 @@ trait StructTemplate {
           "newFieldName" -> genID(field.sid.toTitleCase.prepend("new")),
           "FieldName" -> genID(field.sid.toTitleCase),
           "FIELD_NAME" -> genID(field.sid.toUpperCase),
+          "snake_case_name" -> codify(camelToSnake(field.originalName)),
           "gotName" -> genID(field.sid.prepend("_got_")),
           "id" -> codify(field.index.toString),
           "fieldConst" -> genID(field.sid.toTitleCase.append("Field")),
