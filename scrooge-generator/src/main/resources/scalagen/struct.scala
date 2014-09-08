@@ -186,7 +186,8 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
     def read(json: Json) = {
       val map = ReadCodec.castOrThrow(json)
       {{#fields}}{{#readWriteInfo}}
-      val fieldValue{{fieldName}} = map.getOrElse("{{snake_case_name}}", throw new MappingException(s"Expected field {{snake_case_name}} on JsonObject $map"))
+      {{#optional}}val fieldValue{{fieldName}} = map.get("{{snake_case_name"){{/optional}}
+      {{^optional}}val fieldValue{{fieldName}} = map.getOrElse("{{snake_case_name}}", throw new MappingException(s"Expected field {{snake_case_name}} on JsonObject $map")){{/optional}}
       {{/readWriteInfo}}{{/fields}}
       {{StructName}}({{#fields}}{{#readWriteInfo}}
       {{fieldName}} = Try(com.persist.json.read[{{>optionalType}}](fieldValue{{fieldName}})).recover {
@@ -197,10 +198,13 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
     }
    }
   implicit val jsonWriteCodec = new WriteCodec[{{StructName}}] {
-    def write(obj: {{StructName}}) = JsonObject({{#fields}}{{#readWriteInfo}}
-      "{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})
-      {{/readWriteInfo}}{{/fields|,}}
-    )
+    def write(obj: {{StructName}}) = {
+      val fields = List({{#fields}}{{#readWriteInfo}}
+        {{#optional}}if(obj.{{fieldName}}.isDefined) Some("{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}}.get)) else None{{/optional}}
+        {{^optional}}Some("{{snake_case_name}}" -> com.persist.json.toJson(obj.{{fieldName}})){{/optional}}{{/readWriteInfo}}{{/fields|,}}
+      )
+      fields.flatten.toMap
+    }
   }
 {{/withJson}}
 
