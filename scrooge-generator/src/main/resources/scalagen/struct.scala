@@ -186,8 +186,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
     def read(json: Json) = {
       val map = ReadCodec.castOrThrow(json)
       {{#fields}}{{#readWriteInfo}}
-      {{#optional}}val fieldValue{{fieldName}} = map.get("{{snake_case_name}}"){{/optional}}
-      {{^optional}}val fieldValue{{fieldName}} = map.getOrElse("{{snake_case_name}}", throw new MappingException(s"Expected field {{snake_case_name}} on JsonObject $map")){{/optional}}
+      val fieldValue{{fieldName}} = map.getOrElse("{{snake_case_name}}", {{#optional}}jnull{{/optional}}{{^optional}}throw new MappingException(s"Expected field {{snake_case_name}} on JsonObject $map"){{/optional}})
       {{/readWriteInfo}}{{/fields}}
       {{StructName}}({{#fields}}{{#readWriteInfo}}
       {{fieldName}} = Try(com.persist.json.read[{{>optionalType}}](fieldValue{{fieldName}})).recover {
