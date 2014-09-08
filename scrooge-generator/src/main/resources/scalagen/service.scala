@@ -39,7 +39,7 @@ object {{ServiceName}} {
 import com.twitter.scrooge.{Info, TInfo}
 
 def map: Map[String, Info] = Map({{#internalStructs}}
-  "{{funcName}}" -> Info(
+  "{{func_name}}" -> Info(
                       {{#internalArgsStruct}}TInfo[{{StructName}}](
                         is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
                         readCodec = {{StructName}}.jsonReadCodec,

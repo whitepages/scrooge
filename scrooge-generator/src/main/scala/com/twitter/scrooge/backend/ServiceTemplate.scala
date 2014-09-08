@@ -196,7 +196,8 @@ trait ServiceTemplate {
           "internalResultStruct" -> v(structDict(
             internalResultStruct(f),
             None, includes, options)),
-          "funcName" -> codify(f.funcName.name)
+          "funcName" -> codify(f.funcName.name),
+          "func_name" -> genID(f.funcName.toCamelCase)
         )
       }),
       "finagleClients" -> v(
