@@ -207,6 +207,13 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   }
 {{/withJson}}
 
+  import com.twitter.scrooge.serialization._
+
+  implicit val thriftCodec = new ThriftCodec[{{StructName}}] {
+    def decode(protocol: TProtocol): {{StructName}} = {{StructName}}.decode(protocol)
+    def encode(obj: {{StructName}}, protocol: TProtocol) { {{StructName}}.encode(obj, protocol) }
+  }
+
 {{#fields}}
   private def {{readFieldValueName}}(_iprot: TProtocol): {{fieldType}} = {
 {{#readWriteInfo}}
