@@ -5,6 +5,7 @@ import com.twitter.scrooge.ThriftEnum
 {{#withJson}}
 import com.persist.JsonOps._
 import com.persist.json._
+import com.persist.Exceptions.MappingException
 {{/withJson}}
 
 {{docstring}}

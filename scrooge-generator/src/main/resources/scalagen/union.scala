@@ -14,6 +14,7 @@ import scala.collection.{Map, Set}
 {{#withJson}}
 import com.persist.JsonOps._
 import com.persist.json._
+import com.persist.Exceptions.MappingException
 {{/withJson}}
 
 {{/public}}
