@@ -263,6 +263,10 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   object Immutable extends ThriftStructCodec3[{{StructName}}] {
     override def encode(_item: {{StructName}}, _oproto: TProtocol) { _item.write(_oproto) }
     override def decode(_iprot: TProtocol): {{StructName}} = {{StructName}}.decode(_iprot)
+
+    import com.twitter.scrooge.serialization._
+
+    implicit val thriftCodec = {{StructName}}.thriftCodec
   }
 
   /**

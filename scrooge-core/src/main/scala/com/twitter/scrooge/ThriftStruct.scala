@@ -2,6 +2,8 @@ package com.twitter.scrooge
 
 import org.apache.thrift.protocol.TProtocol
 
+import serialization._
+
 trait ThriftStruct {
   @throws(classOf[org.apache.thrift.TException])
   def write(oprot: TProtocol)
@@ -23,6 +25,8 @@ trait ThriftStructCodec[T <: ThriftStruct] {
 
   @throws(classOf[org.apache.thrift.TException])
   def decode(iprot: TProtocol): T = decoder(iprot)
+
+  implicit val thriftCodec: ThriftCodec[T]
 
   lazy val metaData = new ThriftStructMetaData(this)
 
