@@ -61,8 +61,14 @@ case object {{EnumName}} {
   )
 
 {{#withJson}}
+import shapeless._
+import syntax.typeable._
+
   implicit object JsonReadCodec extends ReadCodec[{{EnumName}}] {
-    def read (json: Json) = valueOf (json.asInstanceOf[String] ).get
+    def read (json: Json) = {
+      val stringValue = json.cast[String].getOrElse(throw new MappingException(s"Expected json to be a String to parse into an Enum but found $json"))
+      valueOf(stringValue).getOrElse(throw new MappingException(s"Could not parse enum {{EnumName}} from String $stringValue"))
+    }
   }
   implicit object JsonWriteCodec extends WriteCodec[{{EnumName}}] {
     def write(obj: {{EnumName}}) = obj.toString

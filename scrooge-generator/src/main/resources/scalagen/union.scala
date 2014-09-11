@@ -110,6 +110,13 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   override def encode(_item: {{StructName}}, _oprot: TProtocol) { _item.write(_oprot) }
   override def decode(_iprot: TProtocol): {{StructName}} = {{StructName}}Decoder(_iprot, UnknownUnionField(_))
 
+  import com.twitter.scrooge.serialization.ThriftCodec
+
+  implicit val thriftCodec = new ThriftCodec[UTest] {
+    def encode(obj: UTest, protocol: TProtocol) { UTest.encode(obj, protocol) }
+    def decode(protocol: TProtocol) = UTest.decode(protocol)
+  }
+
   def apply(_iprot: TProtocol): {{StructName}} = decode(_iprot)
 
   import {{StructName}}Aliases._
@@ -117,8 +124,9 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 {{#withJson}}
   implicit object JsonReadCodec extends ReadCodec[{{StructName}}] {
     def read(json: Json): {{StructName}} = {
-      val jsObject = json.asInstanceOf[JsonObject]
-      jsObject.keys.head match {{{#fields}}
+      val jsObject = ReadCodec.castOrThrow(json)
+      val onlyChild = jsObject.keys.headOption.getOrElse(throw new MappingException(s"Expected json to contain a single child in order to read into union but found: $json"))
+      onlyChild match {{{#fields}}
         case "{{snake_case_name}}" => {{FieldName}}({{fieldName}} = com.persist.json.read[{{>qualifiedFieldType}}](jsObject.values.head))
         {{/fields}}
       }
