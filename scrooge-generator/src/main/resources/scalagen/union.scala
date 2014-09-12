@@ -113,9 +113,9 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
 
   import com.twitter.scrooge.serialization.ThriftCodec
 
-  implicit val thriftCodec = new ThriftCodec[UTest] {
-    def encode(obj: UTest, protocol: TProtocol) { UTest.encode(obj, protocol) }
-    def decode(protocol: TProtocol) = UTest.decode(protocol)
+  implicit val thriftCodec = new ThriftCodec[{{StructName}}] {
+    def encode(obj: {{StructName}}, protocol: TProtocol) { {{StructName}}.encode(obj, protocol) }
+    def decode(protocol: TProtocol) = {{StructName}}.decode(protocol)
   }
 
   def apply(_iprot: TProtocol): {{StructName}} = decode(_iprot)
