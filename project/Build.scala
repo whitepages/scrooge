@@ -208,7 +208,7 @@ object Scrooge extends Build {
     name := "scrooge-core",
     libraryDependencies ++= Seq(
       "org.apache.thrift" % "libthrift" % "0.8.0" % "provided",
-      "com.persist" % "persist-json_2.11" % "0.19"
+      "com.persist" % "persist-json_2.11" % "0.20"
     ),
     crossScalaVersions += "2.11.2"
   )
