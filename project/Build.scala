@@ -7,7 +7,7 @@ import com.typesafe.sbt.site.SphinxSupport.Sphinx
 import net.virtualvoid.sbt.cross.CrossPlugin
 
 object Scrooge extends Build {
-  val libVersion = "3.16.39"
+  val libVersion = "3.16.40"
   val utilVersion = "6.20.0"
   val finagleVersion = "6.20.0"
 
@@ -256,9 +256,9 @@ object Scrooge extends Build {
     id = "scrooge-sbt-plugin",
     base = file("scrooge-sbt-plugin"),
     settings = Project.defaultSettings ++
-      sharedSettings ++
       crossBuildSettings ++
-      bintrayPublishSettings
+      bintrayPublishSettings ++
+      sharedSettings
   ).settings(
     sbtPlugin := true,
     publishMavenStyle := false,
