@@ -4,7 +4,7 @@ import sbt._
 import Keys._
 
 import java.io.File
-import com.twitter.scrooge.backend.{WithFinagle, ServiceOption}
+import com.twitter.scrooge.backend.{WithJson, WithFinagle, ServiceOption}
 
 object ScroogeSBT extends Plugin {
 
@@ -21,7 +21,9 @@ object ScroogeSBT extends Plugin {
     compiler.destFolder = outputDir.getPath
     thriftIncludes.map { compiler.includePaths += _.getPath }
     namespaceMappings.map { e => compiler.namespaceMappings.put(e._1, e._2)}
-    compiler.flags ++= flags
+    // TODO: Remove horrible hard coding, for some reason the commented out line does not work (no flags get considered it would seem)
+    //compiler.flags ++= flags
+    compiler.flags += WithJson
     compiler.thriftFiles ++= thriftFiles.map(_.getPath())
     compiler.language = language.toLowerCase
     compiler.run()
