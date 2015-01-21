@@ -1,7 +1,16 @@
 package com.twitter.scrooge.frontend
 
+import java.io.{FileOutputStream, File, BufferedReader, InputStreamReader}
+
+import com.google.common.base.Charsets
+import com.google.common.io.CharStreams
 import com.twitter.scrooge.ast._
-import com.twitter.scrooge.testutil.Spec
+import com.twitter.scrooge.backend.{GeneratorFactory, ScalaGenerator, TemplateGenerator}
+import com.twitter.scrooge.mustache.HandlebarLoader
+import com.twitter.scrooge.testutil.{TempDirectory, Spec}
+
+import scala.collection.concurrent.TrieMap
+import scala.collection.concurrent.TrieMap
 
 class TypeResolverSpec extends Spec {
   "TypeResolve" should {
@@ -24,6 +33,20 @@ class TypeResolverSpec extends Spec {
       .withMapping(enum.sid.name, enumType)
       .withMapping(struct.sid.name, structType)
       .withMapping(ex.sid.name, exType)
+
+    def getFileContents(resource: String) = {
+      val ccl = Thread.currentThread().getContextClassLoader
+      val is = ccl.getResourceAsStream(resource)
+      val br = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8))
+      CharStreams.toString(br)
+    }
+
+    def generateDoc(str: String) = {
+      val importer = Importer(Seq("src/test/resources/test_thrift", "scrooge-generator/src/test/resources/test_thrift"))
+      val parser = new ThriftParser(importer, true)
+      val doc = parser.parse(str, parser.document)
+      TypeResolver()(doc).document
+    }
 
     def createStruct(structName: String, fieldType: FieldType) = {
       val fieldName: String = structName + "_field"
@@ -258,5 +281,77 @@ class TypeResolverSpec extends Spec {
           fail()
       }
     }
+
+    "resolve a typedef from an included scope referencing another included scope" in {
+      val testFolder = TempDirectory.create(None)
+
+      val libFolder = new File(testFolder, "lib")
+      libFolder.mkdir()
+      val serviceFolder = new File(testFolder, "service")
+      serviceFolder.mkdir()
+
+      val defs = new FileOutputStream(new File(libFolder, "definitions.thrift"))
+      val defString =
+        """
+          | namespace scala com.foo
+          | struct Date {
+          |   1: i32 dt
+          | }
+        """.stripMargin
+      defs.write(defString.getBytes)
+      defs.close()
+
+      val consts = new FileOutputStream(new File(serviceFolder, "constants.thrift"))
+      val constsString =
+        """
+          | namespace scala com.foo
+          | include "lib/definitions.thrift"
+          | typedef definitions.Date Date
+        """.stripMargin
+      consts.write(constsString.getBytes)
+      consts.close()
+
+      val foo = new FileOutputStream(new File(serviceFolder, "foo.thrift"))
+      val fooString =
+        """
+          | namespace scala com.foo
+          | include "service/constants.thrift"
+          | struct Foo {
+          |   1: constants.Date dt
+          | }
+        """.stripMargin
+      foo.write(fooString.getBytes)
+      foo.close()
+
+      val importer = Importer(testFolder)
+      val documentCache = new TrieMap[String, Document]
+      val namespaceMappings = new scala.collection.mutable.HashMap[String, String]
+
+      for (inputFile <- Seq(new File(serviceFolder, "foo.thrift").toString)) {
+        val parser = new ThriftParser(importer, strict = true, defaultOptional = false, skipIncludes = false, documentCache)
+        val doc0 = parser.parseFile(inputFile).mapNamespaces(namespaceMappings.toMap)
+
+        val resolvedDoc = TypeResolver(allowStructRHS = true)(doc0)
+        val generator = GeneratorFactory(
+            "scala",
+            resolvedDoc.resolver.includeMap,
+            "xyzzy",
+            Seq())
+
+        val generatedFiles = generator(
+          resolvedDoc.document,
+          Set(),
+          testFolder, // new File("/tmp")
+          dryRun = false
+        ).map {
+          _.getPath
+        }
+
+        // The generated source should not contain references to "xyzzy"
+        // val br = new BufferedReader(new InputStreamReader(generatedFiles.head, Charsets.UTF_8))
+        // CharStreams.toString(br)
+      }
+    }
+
   }
 }
