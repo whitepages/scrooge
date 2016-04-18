@@ -142,7 +142,12 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
   }
 
 {{#withJson}}
-  implicit object JsonReadCodec extends ReadCodec[{{StructName}}] {
+
+{{#implicitsToImport}}
+  import {{import}}.{{codecs}}
+{{/implicitsToImport}}
+
+  implicit object JsonReadCodec{{StructName}} extends ReadCodec[{{StructName}}] {
     def read(json: Json): {{StructName}} = {
       val jsObject = ReadCodec.castOrThrow(json)
       val onlyChild = jsObject.keys.headOption.getOrElse(throw new MappingException(s"Expected json to contain a single child in order to read into union but found: $json"))
@@ -152,7 +157,7 @@ object {{StructName}} extends ThriftStructCodec3[{{StructName}}] {
       }
     }
   }
-  implicit object JsonWriteCodec extends WriteCodec[{{StructName}}] {
+  implicit object JsonWriteCodec{{StructName}} extends WriteCodec[{{StructName}}] {
     def write(obj: {{StructName}}): Json = obj match {{{#fields}}
       case {{FieldName}}(x) => JsonObject("{{snake_case_name}}" -> com.persist.json.toJson(x))
     {{/fields}}

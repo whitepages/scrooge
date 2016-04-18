@@ -108,6 +108,14 @@ trait StructTemplate {
     }
   }
 
+  def getInnerTypes(ft: FieldType): Set[FieldType] = ft match {
+    case MapType(keyType, valueType, _) => getInnerTypes(keyType) ++ getInnerTypes(valueType)
+    case ListType(valueType, _) => getInnerTypes(valueType)
+    case SetType(valueType, _) => getInnerTypes(valueType)
+    case n: NamedType => Set(n)
+    case _ => Set.empty[FieldType]
+  }
+
   def fieldsToDict(fields: Seq[Field], blacklist: Seq[String]) = {
     fields.zipWithIndex map {
       case (field, index) =>
@@ -316,6 +324,25 @@ trait StructTemplate {
       "docstring" -> codify(struct.docstring.getOrElse("")),
       "parentType" -> codify(parentType),
       "fields" -> v(fieldDictionaries),
+      "implicitsToImport" -> v(
+        struct.fields.flatMap(f => getInnerTypes(f.fieldType)).distinct.map {
+          case ft: NamedType =>
+            Dictionary(
+              "import" ->
+                (if (ft.scopePrefix.isDefined)
+                  codify(genID(qualifyNamedType(ft).toTitleCase).toData)
+                else if(namespace.isDefined)
+                  codify(genID(namespace.get).toData + "." + ft.sid.toTitleCase.fullName)
+                else
+                  codify(genID(qualifyNamedType(ft).toTitleCase).toData)),
+              "codecs" -> (ft match {
+                case e: EnumType => codify(s"{JsonReadCodec${e.sid.toTitleCase.fullName},JsonWriteCodec${e.sid.toTitleCase.fullName}}")
+                case s: StructType if s.struct.isInstanceOf[Union] => codify(s"{JsonReadCodec${s.sid.toTitleCase.fullName},JsonWriteCodec${s.sid.toTitleCase.fullName}}")
+                case n: NamedType => codify(s"{jsonReadCodec${n.sid.toTitleCase.fullName},jsonWriteCodec${n.sid.toTitleCase.fullName}}")
+              })
+            )
+        }
+      ),
       "defaultFields" -> v(fieldsToDict(struct.fields.filter(!_.requiredness.isOptional), Seq())),
       "alternativeConstructor" -> v(
         struct.fields.exists(_.requiredness.isOptional) && struct.fields.exists(_.requiredness.isDefault)),

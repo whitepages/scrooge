@@ -44,13 +44,13 @@ def map: Map[String, Info] = Map({{#internalStructs}}
   "{{func_name}}" -> Info(
                       {{#internalArgsStruct}}TInfo[{{StructName}}](
                         is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
-                        readCodec = {{StructName}}.jsonReadCodec,
-                        writeCodec = {{StructName}}.jsonWriteCodec,
+                        readCodec = {{StructName}}.jsonReadCodec{{StructName}},
+                        writeCodec = {{StructName}}.jsonWriteCodec{{StructName}},
                         companion = {{StructName}}{{/internalArgsStruct}}).asInstanceOf[TInfo[ThriftStruct]],
                       {{#internalResultStruct}}TInfo[{{StructName}}](
                         is = (t: {{StructName}}) => t.isInstanceOf[{{StructName}}],
-                        readCodec = {{StructName}}.jsonReadCodec,
-                        writeCodec = {{StructName}}.jsonWriteCodec,
+                        readCodec = {{StructName}}.jsonReadCodec{{StructName}},
+                        writeCodec = {{StructName}}.jsonWriteCodec{{StructName}},
                         companion = {{StructName}}{{/internalResultStruct}}).asInstanceOf[TInfo[ThriftStruct]])
 {{/internalStructs|,}}
 )
